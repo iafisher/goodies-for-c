@@ -70,6 +70,19 @@ typedef struct {
 qstring qstring_new(const char*);
 
 /**
+ * Return a stack-allocated qstrng struct whose data field is a heap-allocated
+ * copy of the first `n` bytes of the string parameter. The parameter may
+ * contain null bytes and does not need to be null-terminated, although the
+ * data field in the returned qstring will be. The null terminator will be
+ * inserted after the `n` characters of the buffer, so
+ *
+ *   qstring_new_buffer("hello\0", 6)
+ *
+ * will result in a qstring whose data field is "hello\0\0".
+ */
+qstring qstring_new_buffer(const char*, size_t n);
+
+/**
  * Return a stack-allocated qstring struct whose data field is set to the string
  * parameter, which must be null-terminated.
  *
@@ -98,6 +111,12 @@ qstring qstring_copy(qstring);
  * of the substring from `start` to the end of string is returned.
  */
 qstring qstring_substr(qstring, size_t start, size_t n);
+
+/**
+ * Return the first parameter with the substring removed. The `start` and `n`
+ * parameters have the same meaning as with qstring_substr.
+ */
+qstring qstring_remove(qstring, size_t start, size_t n);
 
 /**
  * Concatenate the two qstrings together.
