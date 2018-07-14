@@ -19,7 +19,7 @@ typedef struct {
 
 /*
  * Qstrings are immutable. The qstring structs are stack-allocated and the data
- * field is heap-allocated, except for qstrings returned by qliteral_new.
+ * field is heap-allocated, except for qstrings returned by qliteral.
  *
  * If a qstring method returns a qstring, then that qstring is newly-allocated
  * from the heap, does not share data with any of the parameters, and must be
@@ -69,8 +69,8 @@ qstring qstring_repeat(char c, size_t n);
 
 /**
  * Return a stack-allocated qstring struct whose data field is set to the
- * string parameter, which must be null-terminated. Use qliteral_new where you
- * would otherwise use a string literal. For example,
+ * string parameter, which must be null-terminated. Use qliteral where you would
+ * otherwise use a string literal. For example,
  *
  *   qstring qs = qstring_concat(qs_old, "!");
  *
@@ -84,11 +84,11 @@ qstring qstring_repeat(char c, size_t n);
  *
  * The returned qstring should NOT be passed to qstring_cleanup.
  */
-qstring qliteral_new(const char*);
+qstring qliteral(const char*);
 
 /**
  * Free the heap-allocated data in the qstring. Do not pass objects returned by
- * qliteral_new to this method.
+ * qliteral to this method.
  */
 void qstring_cleanup(qstring);
 

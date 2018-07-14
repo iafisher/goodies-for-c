@@ -40,7 +40,7 @@ qstring qstring_repeat(char c, size_t n) {
     return ret;
 }
 
-qstring qliteral_new(const char* cs) {
+qstring qliteral(const char* cs) {
     qstring ret = {.len = strlen(cs), .data = cs};
     return ret;
 }
