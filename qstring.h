@@ -119,7 +119,20 @@ qstring qstring_remove(qstring qs, size_t start, size_t n);
 qstring qstring_concat(qstring, qstring);
 
 /**
- * Insert the arguments into `fmtstr`, a format string as in printf.
+ * Insert the arguments into `fmtstr`, a format string as in printf. Note that
+ * qstrings cannot be formatted directly into the string, so
+ *
+ *   qstring_format("%s%s", qs1, qs2); // WRONG!
+ *
+ * has to be written as
+ *
+ *   qstring_format("%s%s", qs1.data, qs2.data);
+ *
+ * instead. As this implies, qstring parameters that contain null bytes will
+ * be truncated.
+ *
+ * A future implementation may support a "%qs" format code for qstrings that
+ * works will qstrings containing null bytes.
  */
 qstring qstring_format(qstring fmtstr, ...);
 

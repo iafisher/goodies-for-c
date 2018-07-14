@@ -4,6 +4,8 @@
  * Version: July 2018
  */
 
+#include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "qstring.h"
@@ -96,8 +98,30 @@ qstring qstring_concat(qstring qs1, qstring qs2) {
 }
 
 qstring qstring_format(qstring fmtstr, ...) {
-    // TODO
+    va_list args;
+    va_start(args, fmtstr);
+    va_list args2;
+    va_copy(args2, args);
+
     qstring ret = {.len = 0, .data = NULL};
+    int sz = vsnprintf(NULL, 0, fmtstr.data, args);
+    va_end(args);
+    if (sz == -1) {
+        return ret;
+    }
+    char* data = malloc(sz + 1);
+    if (data == NULL) {
+        return ret;
+    }
+
+    sz = vsnprintf(data, sz+1, fmtstr.data, args2);
+    va_end(args2);
+    if (sz == -1) {
+        free(data);
+        return ret;
+    }
+    ret.data = data;
+    ret.len = sz;
     return ret;
 }
 

@@ -178,7 +178,22 @@ void test_qstring_concat() {
 }
 
 void test_qstring_format() {
-    // TODO
+    qstring qs = qstring_format(qliteral("%s%s"), "Hello, ", "world!");
+
+    ASSERT_STREQ("Hello, world!", qs.data);
+    ASSERT(qs.len == 13);
+    ASSERT(qs.data[qs.len] == '\0');
+
+    qstring_cleanup(qs);
+
+    /* Format an integer. */
+    qs = qstring_format(qliteral("%d test%s"), 1, "");
+
+    ASSERT_STREQ("1 test", qs.data);
+    ASSERT(qs.len == 6);
+    ASSERT(qs.data[qs.len] == '\0');
+
+    qstring_cleanup(qs);
 }
 
 void test_qstring_replace() {
