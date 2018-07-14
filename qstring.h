@@ -1,4 +1,4 @@
-/* THIS MODULE IS NOT YET IMPLEMENTED.
+/* THIS MODULE IS NOT YET FULLY IMPLEMENTED.
  *
  * Easy strings. Length-prefixed so calculating length is O(1) instead of O(n).
  * Handles null bytes correctly. Buffer overflows are impossible. Compatible
@@ -51,6 +51,9 @@
 
 #ifndef QSTRING_H
 #define QSTRING_H
+
+#include <stdbool.h>
+#include <stddef.h>
 
 /* TODO: Add a qrange type? */
 

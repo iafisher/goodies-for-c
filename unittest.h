@@ -28,9 +28,9 @@
  *
  * ASSERT has to be a macro for two reasons:
  *  - It uses undeclared globals, tests_failed and tests_passed.
- *  - It uses the __FILE__ and __LINE__ macro constants, which we want to expand
- *    to the file and line of the test suite, not the file and line of the
- *    unittest implementation.
+ *  - It uses the __FILE__ and __LINE__ macro constants, which we want to
+ *    expand to the file and line of the test suite, not the file and line of
+ *    the unittest implementation.
  *
  * Wrapping the body of a macro in a do-while loop without a terminating
  * semicolon is a common idiom. It ensures that the macro is parsed as a single
@@ -41,7 +41,7 @@
         if (!(condition)) { \
             tests_failed++; \
             fprintf(stderr, "ASSERTION FAILED, %s:%d: %s\n", \
-                __FILE__, __LINE__, #cond); \
+                __FILE__, __LINE__, #condition); \
         } else { \
             tests_passed++; \
         } \
