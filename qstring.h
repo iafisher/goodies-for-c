@@ -4,40 +4,22 @@
  * Handles null bytes correctly. Buffer overflows are impossible. Compatible
  * with the C standard library string functions.
  *
+ * A qstring is a length paired with a data field:
+ */
+
+typedef struct {
+    /* Both fields are considered public and read-only. */
+
+    /* The number of bytes in the data field, excluding the null terminator. */
+    size_t len;
+    /* This character array is null-terminated, so it can be passed to any
+       standard C function. */
+    const char* data;
+} qstring;
+
+/*
  * Qstrings are immutable. The qstring structs are stack-allocated and the data
  * field is heap-allocated, except for qstrings returned by qliteral_new.
- *
- * qliteral_new is a convenience method to use when you would otherwise use a
- * bare string literals. It lets you write
- *
- *   qstring concatted = qstring_concat(qs, qliteral("..."));
- *
- * instead of
- *
- *   qstring literal = qstring_new("...");
- *   qstring concatted = qstring_concat(qs, literal);
- *   qstring_cleanup(literal);
- *
- * Qstrings returned by qliteral_new (call them "qliterals") can be passed to
- * any qstring library function, except for qstring_cleanup. qliteral_new
- * should only be used to wrap string literals in the source code. You must be
- * careful to avoid writing code where a regular qstring and a qliteral could
- * be confused, for instance
- *
- * qstring bad(bool cond) {
- *   if (cond) {
- *     return qstring_new("uh oh");
- *   } else {
- *     return qliteral_new("uh oh");
- *   }
- * }
- *
- * Callers of this function cannot distinguish between qstrings and qliterals,
- * so either they don't free the result and leak memory, or they do free it and
- * cause a segfault when a qliteral is returned.
- *
- * The moral: Use qliteral_new when you want to pass a string literal to a
- * function. Use qstring_new everywhere else.
  *
  * If a qstring method returns a qstring, then that qstring is newly-allocated
  * from the heap, does not share data with any of the parameters, and must be
@@ -56,17 +38,6 @@
 #include <stddef.h>
 
 /* TODO: Add a qrange type? */
-
-typedef struct {
-    /* Both fields are considered public and read-only. */
-
-    /* The number of bytes in the data field, excluding the null terminator. */
-    size_t len;
-    /* This character array is null-terminated, so it can be passed to any
-       standard C function. */
-    const char* data;
-} qstring;
-
 
 /**
  * Return a qstring containing a heap-allocated copy of the string parameter,
@@ -98,12 +69,20 @@ qstring qstring_repeat(char c, size_t n);
 
 /**
  * Return a stack-allocated qstring struct whose data field is set to the
- * string parameter, which must be null-terminated.
+ * string parameter, which must be null-terminated. Use qliteral_new where you
+ * would otherwise use a string literal. For example,
+ *
+ *   qstring qs = qstring_concat(qs_old, "!");
+ *
+ * instead of
+ *
+ *   qstring bang = qstring_new("!");
+ *   qstring qs = qstring_concat(qs_old, bang);
+ *   qstring_cleanup(bang);
+ *
+ * which is longer and makes an unnecessary heap allocation.
  *
  * The returned qstring should NOT be passed to qstring_cleanup.
- *
- * If you are unsure whether to use qstring_new or qliteral_new, please read
- * the comment at the top of this module. If in doubt, choose qstring_new.
  */
 qstring qliteral_new(const char*);
 
