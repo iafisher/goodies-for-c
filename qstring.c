@@ -239,7 +239,8 @@ qstring qstring_lstrip(qstring qs, qstring to_strip) {
 
 qstring qstring_rstrip(qstring qs, qstring to_strip) {
     size_t nsuffix = 0;
-    while (memchr(to_strip.data, qs.data[nsuffix], to_strip.len) != NULL) {
+    while (memchr(to_strip.data, qs.data[qs.len - (nsuffix + 1)], to_strip.len)
+            != NULL) {
         nsuffix++;
     }
     return qstring_substr(qs, 0, qs.len - nsuffix);
@@ -247,7 +248,8 @@ qstring qstring_rstrip(qstring qs, qstring to_strip) {
 
 qstring qstring_strip(qstring qs, qstring to_strip) {
     size_t nsuffix = 0;
-    while (memchr(to_strip.data, qs.data[nsuffix], to_strip.len) != NULL) {
+    while (memchr(to_strip.data, qs.data[qs.len - (nsuffix + 1)], to_strip.len)
+            != NULL) {
         nsuffix++;
     }
     size_t nprefix = 0;
