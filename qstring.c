@@ -77,8 +77,10 @@ qstring qstring_remove(qstring qs, size_t start, size_t n) {
     if (data == NULL) {
         return ret;
     }
+    /* Copy the data before the removed substring. */
     memcpy(data, qs.data, start);
-    memcpy(data + start, qs.data + start + n, qs.len - n + 1);
+    /* Copy the data after the removed substring. */
+    memcpy(data + start, qs.data + start + n, qs.len - n - start + 1);
     ret.data = data;
     ret.len = qs.len - n;
     return ret;
