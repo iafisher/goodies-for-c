@@ -6,7 +6,9 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include "qio.h"
 #include "qstring.h"
 #include "unittest.h"
 
@@ -304,6 +306,28 @@ void test_qstring_strip() {
     qstring_cleanup(qs);
 }
 
+void test_qio_readpath() {
+    size_t n;
+    char* data = qio_readpath("assets/smallfile.txt", &n);
+
+    ASSERT_UINTEQ(14, n);
+    ASSERT_STREQ("A small file.\n", data);
+
+    free(data);
+
+    data = qio_readpath("assets/ozymandias.txt", &n);
+    ASSERT_UINTEQ(627, n);
+    free(data);
+
+    data = qio_readpath("assets/kern_utf8.txt", &n);
+    ASSERT_UINTEQ(1144, n);
+    free(data);
+}
+
+void test_qio_readline() {
+    // TODO
+}
+
 int main() {
     /* Test the qstring library. */
     test_qstring_new();
@@ -320,6 +344,10 @@ int main() {
     test_qstring_count();
     test_qstring_startswith_endswith();
     test_qstring_strip();
+
+    /* Test the qio library. */
+    test_qio_readpath();
+    test_qio_readline();
 
     unsigned int tests_run = tests_failed + tests_passed;
     const char* plural = (tests_run == 1) ? "" : "s";

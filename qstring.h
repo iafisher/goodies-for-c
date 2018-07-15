@@ -4,23 +4,9 @@
  * Handles null bytes correctly. Buffer overflows are impossible. Compatible
  * with the C standard library string functions.
  *
- * A qstring is a length paired with a data field:
- */
-
-typedef struct {
-    /* Both fields are considered public and read-only. */
-
-    /* The number of bytes in the data field, excluding the null terminator. */
-    size_t len;
-    /* This character array is null-terminated, so it can be passed to any
-       standard C function. */
-    char* data;
-    /* TODO: unsigned char*? */
-} qstring;
-
-/*
- * Qstrings are immutable. The qstring structs are stack-allocated and the data
- * field is heap-allocated, except for qstrings returned by qliteral.
+ * A qstring is a length paired with a data field. Qstrings are immutable. The
+ * qstring structs are stack-allocated and the data field is heap-allocated,
+ * except for qstrings returned by qliteral.
  *
  * If a qstring method returns a qstring, then that qstring is newly-allocated
  * from the heap, does not share data with any of the parameters, and must be
@@ -37,6 +23,17 @@ typedef struct {
 
 #include <stdbool.h>
 #include <stddef.h>
+
+typedef struct {
+    /* Both fields are considered public and read-only. */
+
+    /* The number of bytes in the data field, excluding the null terminator. */
+    size_t len;
+    /* This character array is null-terminated, so it can be passed to any
+       standard C function. */
+    char* data;
+    /* TODO: unsigned char*? */
+} qstring;
 
 /* TODO: Add a qrange type? */
 
