@@ -16,39 +16,41 @@ qstring qstring_new(const char* cs) {
 
 qstring qstring_new_buffer(const char* buffer, size_t n) {
     qstring ret = {.len = 0, .data = NULL};
-    char* data = malloc(n + 1);
-    if (data == NULL) {
+    ret.data = malloc(n + 1);
+    if (ret.data == NULL) {
         return ret;
     }
-    memcpy(data, buffer, n);
-    data[n] = '\0';
-    ret.data = data;
+    memcpy(ret.data, buffer, n);
     ret.len = n;
+    ret.data[ret.len] = '\0';
     return ret;
 }
 
 qstring qstring_repeat(char c, size_t n) {
     qstring ret = {.len = 0, .data = NULL};
-    char* data = malloc(n + 1);
-    if (data == NULL) {
+    ret.data = malloc(n + 1);
+    if (ret.data == NULL) {
         return ret;
     }
     for (size_t i = 0; i < n; i++) {
-        data[i] = c;
+        ret.data[i] = c;
     }
-    data[n] = '\0';
-    ret.data = data;
     ret.len = n;
+    ret.data[ret.len] = '\0';
     return ret;
 }
 
 qstring qliteral(const char* cs) {
-    qstring ret = {.len = strlen(cs), .data = cs};
+    /* Casting const char* to char* is obviously dangerous, which is why the
+     * API documentation for this function comes with a warning about misusing
+     * the return value.
+     */
+    qstring ret = {.len = strlen(cs), .data = (char*)cs};
     return ret;
 }
 
 void qstring_cleanup(qstring qs) {
-    free((char*)qs.data);
+    free(qs.data);
 }
 
 qstring qstring_copy(qstring qs) {
@@ -73,28 +75,27 @@ qstring qstring_remove(qstring qs, size_t start, size_t n) {
         n = qs.len - start;
     }
     qstring ret = {.len = 0, .data = NULL};
-    char* data = malloc(qs.len - n + 1);
-    if (data == NULL) {
+    ret.data = malloc(qs.len - n + 1);
+    if (ret.data == NULL) {
         return ret;
     }
     /* Copy the data before the removed substring. */
-    memcpy(data, qs.data, start);
-    /* Copy the data after the removed substring. */
-    memcpy(data + start, qs.data + start + n, qs.len - n - start + 1);
-    ret.data = data;
+    memcpy(ret.data, qs.data, start);
+    /* Copy the data after the removed substring, including the null terminator.
+     */
+    memcpy(ret.data + start, qs.data + start + n, qs.len - n - start + 1);
     ret.len = qs.len - n;
     return ret;
 }
 
 qstring qstring_concat(qstring qs1, qstring qs2) {
     qstring ret = {.len = 0, .data = NULL};
-    char* data = malloc(qs1.len + qs2.len + 1);
-    if (data == NULL) {
+    ret.data = malloc(qs1.len + qs2.len + 1);
+    if (ret.data == NULL) {
         return ret;
     }
-    memcpy(data, qs1.data, qs1.len);
-    memcpy(data + qs1.len, qs2.data, qs2.len + 1);
-    ret.data = data;
+    memcpy(ret.data, qs1.data, qs1.len);
+    memcpy(ret.data + qs1.len, qs2.data, qs2.len + 1);
     ret.len = qs1.len + qs2.len;
     return ret;
 }
@@ -111,18 +112,17 @@ qstring qstring_format(qstring fmtstr, ...) {
     if (sz == -1) {
         return ret;
     }
-    char* data = malloc(sz + 1);
-    if (data == NULL) {
+    ret.data = malloc(sz + 1);
+    if (ret.data == NULL) {
         return ret;
     }
 
-    sz = vsnprintf(data, sz+1, fmtstr.data, args2);
+    sz = vsnprintf(ret.data, sz+1, fmtstr.data, args2);
     va_end(args2);
     if (sz == -1) {
-        free(data);
+        free(ret.data);
         return ret;
     }
-    ret.data = data;
     ret.len = sz;
     return ret;
 }
@@ -134,8 +134,8 @@ qstring qstring_replace_all(qstring qs, qstring before, qstring after) {
     }
     size_t newlen = qs.len + count * (after.len - before.len);
     qstring ret = {.len = 0, .data = NULL};
-    char* data = malloc(newlen + 1);
-    if (data == NULL) {
+    ret.data = malloc(newlen + 1);
+    if (ret.data == NULL) {
         return ret;
     }
     //size_t index = 0;
@@ -147,15 +147,17 @@ static qstring replace_substr(qstring qs, size_t start, size_t n,
     qstring replacing) {
     size_t newlen = qs.len - n + replacing.len;
     qstring ret = {.len = 0, .data = NULL};
-    char* data = malloc(newlen + 1);
-    if (data == NULL) {
+    ret.data = malloc(newlen + 1);
+    if (ret.data == NULL) {
         return ret;
     }
-    memcpy(data, qs.data, start);
-    memcpy(data + start, replacing.data, replacing.len);
-    memcpy(data + start + replacing.len, qs.data + start + n,
+    /* Copy the original string before the replaced substring. */
+    memcpy(ret.data, qs.data, start);
+    /* Copy the replacement string. */
+    memcpy(ret.data + start, replacing.data, replacing.len);
+    /* Copy the original string after the replaced substring. */
+    memcpy(ret.data + start + replacing.len, qs.data + start + n,
         qs.len - (start - n + 1));
-    ret.data = data;
     ret.len = newlen;
     return ret;
 }

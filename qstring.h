@@ -14,7 +14,8 @@ typedef struct {
     size_t len;
     /* This character array is null-terminated, so it can be passed to any
        standard C function. */
-    const char* data;
+    char* data;
+    /* TODO: unsigned char*? */
 } qstring;
 
 /*

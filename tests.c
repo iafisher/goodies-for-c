@@ -299,7 +299,7 @@ void test_qstring_strip() {
 
     ASSERT_STREQ("chenecta", qs.data);
     ASSERT_UINTEQ(8, qs.len);
-    ASSERT_CHAREQ('\0', qs.data[qs.len-1]);
+    ASSERT_CHAREQ('\0', qs.data[qs.len]);
 
     qstring_cleanup(qs);
 }
